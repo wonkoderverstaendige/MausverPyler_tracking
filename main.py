@@ -69,7 +69,7 @@ def main(source, *args, **kwargs):
     ##capture.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, total_frames-2000)  # jump to end of file
 
     delay = 1
-    frame_skip = 25
+    frame_skip = 50
     fps = None
     tick_freq = cv2.getTickFrequency()
     tick_last = cv2.getTickCount()
@@ -96,7 +96,14 @@ def main(source, *args, **kwargs):
             contours, hierarchy = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             min_area = 500
 
-            passed = [cnt for cnt in contours if cv2.contourArea(cnt.astype(int)) > min_area]
+            passed = []
+            areas = []
+            for cnt in contours:
+                area = cv2.contourArea(cnt.astype(int))
+                if area > min_area:
+                    passed.append(cnt)
+                    areas.append(area)
+
             n_shapes = len(passed)
             detect_count.append(n_shapes)
 
@@ -110,7 +117,7 @@ def main(source, *args, **kwargs):
 
                 cv2.imshow('MOGx.erode()', eroded)
                 cv2.imshow('MOGx.erode().dilate()', dilated)
-                cv2.imshow("Masked raw gray", cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)*arena_mask)
+                #cv2.imshow("Masked raw gray", cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)*arena_mask)
 
                 #draw found contours into new image
                 contour_img = np.zeros_like(arena_mask)
@@ -121,6 +128,16 @@ def main(source, *args, **kwargs):
                     rect = cv2.minAreaRect(cnt)
                     box = cv2.cv.BoxPoints(rect)
                     box = np.int0(box)
+
+                    moments = cv2.moments(cnt) #.astype(int)
+                    cx = (moments['m10']*1.)/moments['m00']
+                    cy = (moments['m01']*1.)/moments['m00']
+
+                    cv2.putText(img, "x:{0:.0f}%, y:{1:.0f}".format(cx, cy),
+                                (int(cx)-50, int(cy)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                    cv2.putText(img, "area:{0:.0f}".format(areas[n]),
+                                (int(cx)-50, int(cy)+15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+
                     cv2.drawContours(img, [box], 0, color, 2)
                 cv2.imshow('Contours', contour_img)
 
