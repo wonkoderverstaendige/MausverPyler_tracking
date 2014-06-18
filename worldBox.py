@@ -1,7 +1,13 @@
-__author__ = 'dfangstrom'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Created on 01. June 214 16:34
+@author: <'Daniel Fängström'> daniel.fengstrom@gmail.com
+
+"""
+
 import Box2D
 from Box2D import *
-
 import pygame
 from pygame.locals import *
 
