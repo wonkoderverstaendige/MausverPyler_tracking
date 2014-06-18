@@ -153,9 +153,9 @@ def main(source, *args, **kwargs):
                             (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
                 cv2.imshow('raw', img)
 
-                key = cv2.waitKey(10) - 0x100000
+                key = cv2.waitKey(delay) - 0x100000
                 if key > -1:
-                    print key
+                    print "Pressed key {0:d}".format(key)
                 if key in (27, 113):  # ESC or 'q'
                     capture.release()
                     cv2.destroyAllWindows()
